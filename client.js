@@ -8,10 +8,8 @@ const { io } = require("socket.io-client");
 async function main(argv) {
     const server = argv[2];
 
-    const socket = io(server, {
-        ackTimeout: 1000,
-        retries: 3,
-      });
+    const manager = new io.Manager(server);
+    const socket = manager.socket("/");
 
     let connect_error = false;    
     const connectPromise = new Promise((resolve, reject) => {
@@ -37,7 +35,7 @@ async function main(argv) {
       });
 
       socket.on("connect", ()=> {
-        console.log(`Connected to ${server}`);
+        console.log(`Connected to ${server} socket ${socket.id}`);
         connect_error = false;
         if (!done) {
           done = true;
@@ -65,8 +63,6 @@ async function main(argv) {
     });
 
 
-//    let run = true;
-//    while(run) {
     rl.prompt();
     if (!connect_error)
       for await (const msg of rl) {
@@ -75,22 +71,14 @@ async function main(argv) {
 
         if (!msg)
             break;
-        console.log(msg);
-        console.log(`timeout: ${socket.io.timeout()}`);
-        socket.timeout(1000).emit("client", msg, 
-          (err, val) => {
-            if (err)
-              console.log(`Server fails: ${err}`);
-            else
-              console.log(`Server succeed: ${val} msg: ${msg}`);
-          }
-        );
-//        try {
-//          await socket.timeout(100).emitWithAck("client", msg);
-//        }
-//        catch(err) {
-//          console.log(`Server fails: ${err.message}`);
-//        }
+
+        try {
+          await socket.timeout(1000).emitWithAck("client", msg);
+          console.log(`${msg} is emitted to ${server}`);
+        }
+        catch(err) {
+          console.log(`Server fails: ${err.message}`);
+        }
         rl.prompt();
       }
     rl.close();

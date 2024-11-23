@@ -13,23 +13,20 @@ function main(argv) {
     const io = new socketIO.Server(server);
 
     io.on('connection', async (socket) => {
-        const clientName = `${socket.handshake.address}(${socket.handshake.url})`;
+        const clientName = `${socket.handshake.address}(${socket.handshake.url}, id: ${socket.id})`;
         console.log(`Client ${clientName} connected`);
         
         socket.on('client', async (clientMsg, callback) => {
             const serverMsg = `${clientName}: ${clientMsg}`;
             console.log(`emit(${serverMsg})`);
             io.emit(serverMsg);
-            callback("got it");
+            callback(undefined);
         });
     });
 
     server.listen(port, () => {
         console.log(`server running at http://localhost:${port}`);
       });
-    
-    console.log("server finished");
-  
 }
 
 if (require.main === module)
