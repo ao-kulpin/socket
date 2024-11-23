@@ -19,7 +19,7 @@ function main(argv) {
         socket.on('client', async (clientMsg, callback) => {
             const serverMsg = `${clientName}: ${clientMsg}`;
             console.log(`emit(${serverMsg})`);
-            io.emit(serverMsg);
+            io.emit('server', serverMsg);
             callback(undefined);
         });
     });

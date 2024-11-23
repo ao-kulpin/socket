@@ -62,6 +62,10 @@ async function main(argv) {
       prompt: "your message> ",
     });
 
+    socket.on("server", (msg) => {
+      console.log(`Recieved fom ${server}: ${msg}`);
+      rl.prompt();
+    });
 
     rl.prompt();
     if (!connect_error)
@@ -73,7 +77,7 @@ async function main(argv) {
             break;
 
         try {
-          await socket.timeout(1000).emitWithAck("client", msg);
+          await socket.timeout(2000).emitWithAck("client", msg);
           console.log(`${msg} is emitted to ${server}`);
         }
         catch(err) {
