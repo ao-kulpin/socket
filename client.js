@@ -62,18 +62,26 @@ async function main(argv) {
       prompt: "your message> ",
     });
 
+    const delayedMessages = [];
+
+    function storeMesssage(msg) {
+      delayedMessages.push(msg);
+    }
+
+    function logMessages() {
+      while (delayedMessages.length > 0)
+        console.log(delayedMessages.shift());
+    }
+
     socket.on("server", (msg) => {
-      console.log(`Recieved fom ${server}: ${msg}`);
-      rl.prompt();
+      storeMesssage(`Recieved fom ${server}: ${msg}`);
     });
 
     rl.prompt();
-    if (!connect_error)
-      for await (const msg of rl) {
-        if (connect_error)
-            break;
-
-        if (!msg)
+    for await (const msg of rl) {
+        logMessages();
+        
+        if (connect_error || !msg)
             break;
 
         try {
