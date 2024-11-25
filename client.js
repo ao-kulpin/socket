@@ -77,19 +77,28 @@ async function main(argv) {
       storeMesssage(`Recieved fom ${server}: ${msg}`);
     });
 
+    socket.on("disconnect", (reason) => {
+      storeMesssage(`*** disconnect event, reason: ${reason} socket: ${socket.id} ***`)
+    });
+
+    for(const es of ["connect", "connect_error"])
+      socket.on(es, (reason) => {
+        storeMesssage(`*** ${es} event socket: ${socket.id} ***`)
+      });
+  
     rl.prompt();
     for await (const msg of rl) {
         logMessages();
-        
+
         if (connect_error || !msg)
             break;
 
         try {
           await socket.timeout(2000).emitWithAck("client", msg);
-          console.log(`${msg} is emitted to ${server}`);
+          console.log(`msg: ${msg} is emitted to ${server}`);
         }
         catch(err) {
-          console.log(`Server fails: ${err.message}`);
+          console.log(`*** Server fails msg: ${msg} / err: ${err.message} ***`);
         }
         rl.prompt();
       }
