@@ -4,6 +4,12 @@ const http = require("node:http");
 const express  = require("express");
 const socketIO = require("socket.io");
 
+function logSocket(socket) {
+    console.log(`  id: ${socket.id}`);
+    console.log(`  handshake.address: ${socket.handshake.address}`);
+    console.log(`  handshake.url: ${socket.handshake.url}`);
+    console.log(`  transport: ${socket.conn.transport.name}`);
+}
 
 function main(argv) {
     const port = parseInt(argv[2]);
@@ -13,11 +19,12 @@ function main(argv) {
     const io = new socketIO.Server(server);
 
     io.on('connection', async (socket) => {
-        const clientName = `${socket.handshake.address}(${socket.handshake.url}, id: ${socket.id})`;
-        console.log(`Client ${clientName} connected`);
+        const clientName = `addr: ${socket.handshake.address} url: ${socket.handshake.url}, id: ${socket.id}`;
+        console.log("Client is connected:");
+        logSocket(socket);
         
         socket.on('client', async (clientMsg, callback) => {
-            const serverMsg = `${clientName}: ${clientMsg}`;
+            const serverMsg = `(${clientName}): ${clientMsg}`;
             console.log(`emit(${serverMsg})`);
             io.emit('server', serverMsg);
             callback(undefined);

@@ -7,8 +7,9 @@ const { io } = require("socket.io-client");
 
 async function main(argv) {
     const server = argv[2];
+    const transport = argv.length < 4 ? "polling" : argv[3];
 
-    const manager = new io.Manager(server);
+    const manager = new io.Manager(server, { transports: [transport] });
     const socket = manager.socket("/");
 
     let connect_error = false;    
