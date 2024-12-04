@@ -50,6 +50,9 @@ function main(argv) {
             io.emit('server', serverMsg);
             callback(undefined);
         });
+        socket.on("disconnect", (reason) => {
+            console.log(`*** Client is disconnected, reason: ${reason} socket: ${socket.id} ***`)
+        });
     });
 
     server.listen(port, () => {
