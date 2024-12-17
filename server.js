@@ -35,7 +35,8 @@ function logSocket(socket) {
 }
 
 function main(argv) {
-    const port = parseInt(argv[2]);
+    const protocol = argv.length < 3 ? "http": argv[2];
+    const port = argv.length < 4 ? 80 : parseInt(argv[3]);
 
     const options = {
         key: fs.readFileSync(
@@ -49,8 +50,7 @@ function main(argv) {
     console.log(options.cert);
 
     const app = express();
-///////    const server = http.createServer(app);
-    const server = https.createServer(options, app);
+    const server = (protocol == "https" ? https: http).createServer(options, app);
     const io = new socketIO.Server(server);
 
     io.on('connection', async (socket) => {
@@ -70,7 +70,7 @@ function main(argv) {
     });
 
     server.listen(port, () => {
-        console.log(`server running at http://localhost:${port}`);
+        console.log(`server is running at ${protocol}://localhost:${port}`);
       });
 }
 
