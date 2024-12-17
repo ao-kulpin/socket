@@ -1,5 +1,7 @@
 const process = require('node:process');
 const http = require("node:http");
+const https = require('node:https');
+const fs = require('node:fs');
 
 const express  = require("express");
 const socketIO = require("socket.io");
@@ -35,8 +37,20 @@ function logSocket(socket) {
 function main(argv) {
     const port = parseInt(argv[2]);
 
+    const options = {
+        key: fs.readFileSync(
+            "C:/data/learn/nodejs/socket/privateKey.key"
+        ),
+        cert: fs.readFileSync(
+            "C:/data/learn/nodejs/socket/certificate.crt"
+        ),
+    };
+    console.log(options.key);
+    console.log(options.cert);
+
     const app = express();
-    const server = http.createServer(app);
+///////    const server = http.createServer(app);
+    const server = https.createServer(options, app);
     const io = new socketIO.Server(server);
 
     io.on('connection', async (socket) => {
