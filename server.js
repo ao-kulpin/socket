@@ -39,10 +39,10 @@ function main(argv) {
 
     const options = {
         key: fs.readFileSync(
-            "C:/data/learn/nodejs/socket/privateKey.key"
+            "certbot/akulpin2.ru/privkey.pem"
         ),
         cert: fs.readFileSync(
-            "C:/data/learn/nodejs/socket/certificate.crt"
+            "certbot/akulpin2.ru/fullchain.pem"
         ),
     };
     console.log(options.key);
