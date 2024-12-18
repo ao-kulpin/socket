@@ -46,8 +46,6 @@ function main(argv) {
             "certbot/akulpin2.ru/fullchain.pem"
         ),
     };
-    console.log(options.key);
-    console.log(options.cert);
 
     const app = express();
     const server = (protocol == "https" ? https: http).createServer(options, app);

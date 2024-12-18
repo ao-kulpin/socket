@@ -74,38 +74,59 @@ async function main(argv) {
         console.log(delayedMessages.shift());
     }
 
+    let waitLine = true;
+    function logIfNeeded() {
+      if(rl.line == "" && delayedMessages.length > 0) {
+        if (waitLine)
+          console.log("\n");
+
+        logMessages();
+
+        if (waitLine)
+          rl.prompt();
+      }
+    }
+
     socket.on("server", (msg) => {
-      storeMesssage(`Recieved fom ${server}: ${msg}`);
+      storeMesssage(`===> Recieved from ${server}: ${msg}`);
+      logIfNeeded();
     });
 
     socket.on("disconnect", (reason) => {
-      storeMesssage(`*** disconnect event, reason: ${reason} socket: ${socket.id} ***`)
+      storeMesssage(`*** disconnect event, reason: ${reason} socket: ${socket.id} ***`);
+      logIfNeeded();
     });
 
     for(const es of ["connect", "connect_error"])
       socket.on(es, (reason) => {
-        storeMesssage(`*** ${es} event socket: ${socket.id} ***`)
-      });
-  
-    rl.prompt();
-    for await (const msg of rl) {
-        logMessages();
+        storeMesssage(`*** ${es} event socket: ${socket.id} ***`);
+        logIfNeeded();
+      });      
 
-        if (connect_error || !msg)
-            break;
+    rl.prompt();  
+    for await(const clientMsg of rl) {
+      waitLine = false;
 
-        try {
-          await socket.timeout(2000).emitWithAck("client", msg);
-          console.log(`msg: ${msg} is emitted to ${server}`);
-        }
-        catch(err) {
-          console.log(`*** Server fails msg: ${msg} / err: ${err.message} ***`);
-        }
-        rl.prompt();
+      logMessages();
+
+      if(!clientMsg)
+        break;
+
+      try {
+        await socket.timeout(2000).emitWithAck("client", clientMsg);
+        console.log(`<=== sent to ${server}: ${clientMsg}`);
       }
+      catch(err) {
+        console.log(`*** Server fails msg: (${clientMsg}) / err: ${err.message} ***`);
+      }
+      rl.prompt();
+      waitLine = true;
+    }
+
     rl.close();
+    socket.off();
     socket.disconnect();
-    console.log("The End")
+    console.log("The End of the Client")
 }
 
 if (require.main === module)
