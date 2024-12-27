@@ -36,7 +36,8 @@ function logSocket(socket) {
 
 function main(argv) {
     const protocol = argv.length < 3 ? "http": argv[2];
-    const port = argv.length < 4 ? 80 : parseInt(argv[3]);
+    const host = argv.length < 4 ? "0.0.0.0" : argv[3];
+    const port = argv.length < 5 ? 80 : parseInt(argv[4]);
 
     const options = {
         key: fs.readFileSync(
@@ -67,9 +68,9 @@ function main(argv) {
         });
     });
 
-    server.listen(port, () => {
-        console.log(`server is running at ${protocol}://localhost:${port}`);
-      });
+    server.listen(port, host, () => {
+            console.log(`server is running at ${protocol}://${host}:${port}`);
+    });
 }
 
 if (require.main === module)
